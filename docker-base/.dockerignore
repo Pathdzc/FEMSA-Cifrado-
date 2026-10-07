@@ -1,0 +1,8 @@
+data/
+resultados/
+__pycache__/
+**/__pycache__/
+.pytest_cache/
+.git/
+*.zip
+.DS_Store
