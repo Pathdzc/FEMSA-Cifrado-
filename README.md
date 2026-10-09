@@ -1,11 +1,9 @@
-# Proyecto B · Discos Duros Cifrados
+# Proyecto Discos Duros Cifrados
 
 Herramienta para evaluar el control de cifrado de discos en las PCs de FEMSA.
-Reto con el socio formador Auditoría FEMSA (TI & Ciberseguridad) · Tecnológico de Monterrey.
 
 ## Cómo correrlo
-
-**Con Docker (recomendado):**
+Con Docker
 
 ```
 docker compose up --build
@@ -13,7 +11,7 @@ docker compose up --build
 
 Abrir http://localhost:5000
 
-**Sin Docker:** ver la sección de instalación en `docs/stack.md`, luego:
+Sin Docker: ver la sección de instalación en `docs/stack.md`, luego:
 
 ```
 flask --app app run
@@ -21,10 +19,10 @@ flask --app app run
 
 ## Datos
 
-- Por defecto se usan los **datos simulados** (`datos/simulados/`).
-- Los datos reales **nunca** se suben al repositorio ni quedan dentro de la imagen.
+- Por defecto se usan los datos simulados (`datos/simulados/`).
+- Los datos reales nunca se suben al repositorio ni quedan dentro de la imagen.
   Para usarlos con Docker, define dos variables antes de `docker compose up`:
-  - `CARPETA_REALES`: la carpeta de tu computadora donde está el archivo real.
+  - `CARPETA_REALES`: la carpeta de la computadora donde está el archivo real.
   - `ARCHIVO_DATOS`: `datos/reales/<nombre del archivo>`.
 
 ## Documentación
