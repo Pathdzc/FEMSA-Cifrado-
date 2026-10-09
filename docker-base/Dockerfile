@@ -1,6 +1,5 @@
 # Docker base del proyecto FEMSA - discos cifrados
-# Un solo contenedor donde despues va a vivir todo (modelo + interfaz).
-# No se instala nada fuera del contenedor.
+# Un solo contenedor donde despues va a vivir todo
 
 FROM python:3.11-slim
 
@@ -8,6 +7,7 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
     DATOS_DIR=/app/data \
     SALIDA_DIR=/app/resultados
+    REGLAS_PATH=/app/app/reglas.yaml
 
 WORKDIR /app
 
@@ -22,6 +22,7 @@ COPY app/ app/
 RUN useradd --create-home appuser \
  && mkdir -p /app/data /app/resultados \
  && chown -R appuser /app
+ 
 USER appuser
 
 CMD ["python", "-m", "app.main"]
