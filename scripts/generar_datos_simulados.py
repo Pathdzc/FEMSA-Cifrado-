@@ -1,12 +1,5 @@
 """
-Genera datos SIMULADOS con la misma estructura y los mismos valores posibles
-que el archivo real de FEMSA. Ninguna fila viene de los datos reales.
-
-Sin supuestos: cada columna se llena al azar, con la misma probabilidad
-para cada valor posible e independiente de las demás columnas.
-Las únicas excepciones son relaciones que son definiciones, no supuestos:
-  - Región se obtiene del País (geografía).
-  - Banda Antigüedad se obtiene de Antigüedad Meses.
+Genera datos SIMULADOS. Ninguna fila viene de los datos reales.
 
 Uso (desde la carpeta raíz del proyecto):
     python scripts/generar_datos_simulados.py
@@ -20,15 +13,13 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from config import COLUMNAS
 
 random.seed(42)          # misma semilla = siempre los mismos datos
-TOTAL_FILAS = 5563       # igual que el archivo real
+TOTAL_FILAS = 5563       
 ID_MAXIMO = 5588         # los EquipoID van de PC-001 a PC-5588
-USUARIO_MAXIMO = 4517    # los UsuarioID van de U-001 a U-4517
+USUARIO_MAXIMO = 4517    
 SALIDA = "datos/simulados/equipos_simulados.csv"
 ND = "No disponible"
 
-# ---------------------------------------------------------------
-# Valores posibles de cada columna (los que nos pasó FEMSA)
-# ---------------------------------------------------------------
+# Valores posibles de cada columna 
 VALORES = {
     "País": ["Argentina", "Brasil", "Colombia", "Costa Rica", "Guatemala", "México",
              "Nicaragua", ND, "Panamá", "Uruguay", "Venezuela"],
@@ -81,9 +72,7 @@ def banda_antiguedad(meses):
     return "3-4 años"
 
 
-# ---------------------------------------------------------------
-# PASO 1: generar un equipo (una fila)
-# ---------------------------------------------------------------
+#   Generar un equipo (una fila)
 def generar_equipo(equipo_id):
     fila = {columna: random.choice(opciones) for columna, opciones in VALORES.items()}
 
@@ -95,18 +84,14 @@ def generar_equipo(equipo_id):
     return fila
 
 
-# ---------------------------------------------------------------
-# PASO 2: generar todas las filas (IDs únicos entre PC-001 y PC-5588)
-# ---------------------------------------------------------------
+# Generar todas las filas (IDs únicos entre PC-001 y PC-5588)
 ids = sorted(random.sample(range(1, ID_MAXIMO + 1), TOTAL_FILAS))
 datos = pd.DataFrame([generar_equipo(i) for i in ids], columns=COLUMNAS)
 
-# Antigüedad como número entero (sin ".0") y vacía cuando no hay dato
+# Antigüedad vacía cuando no hay dato y entera
 datos["Antigüedad Meses"] = datos["Antigüedad Meses"].astype("Int64")
 
-# ---------------------------------------------------------------
-# PASO 3: guardar
-# ---------------------------------------------------------------
+# Guardar
 os.makedirs(os.path.dirname(SALIDA), exist_ok=True)
-datos.to_csv(SALIDA, index=False, encoding="utf-8-sig")   # utf-8-sig: Excel lee bien los acentos
+datos.to_csv(SALIDA, index=False, encoding="utf-8-sig")   # Excel lee bien los acentos
 print(f"Listo: {len(datos)} filas y {len(datos.columns)} columnas en {SALIDA}")
