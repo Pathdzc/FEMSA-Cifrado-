@@ -1,21 +1,55 @@
-version: "1.0"
-reglas_cifrado:
-  - id: R1
-    nombre: "Cifrado Válido"
-    campo: "encryption_status"
-    condicion: "equals"
-    valor: "Encrypted"
-    accion: "MARCAR_CONFORME"
+columnas_esperadas:
+  - EquipoID
+  - UsuarioID
+  - País
+  - Región
+  - Sistema Operativo
+  - Versión SO
+  - Estado TPM
+  - Encryption Readiness
+  - Estado de Cifrado
+  - Tecnología de cifrado State
+  - Estado de Cumplimiento
+  - Categoría de Equipo
+  - Clase de Equipo
+  - Perfil de Privilegio
+  - Antigüedad Meses
+  - Banda Antigüedad
+  - Estado de Cuenta
+  - Mes Último Logon
+  - Banda Recencia
+  - Estado Hardware
+  - Tipo de Red
+  - Fuente de Datos
+  - En MDM
+  - En AD
+  - En MacOS
 
-  - id: R2
-    nombre: "Sin Cifrado"
-    campo: "encryption_status"
-    condicion: "equals"
-    valor: "Unencrypted"
-    accion: "MARCAR_NO_CONFORME"
+valores_sin_evidencia:
+  - "No disponible"
+  - ""
+  - "NA"
+  - "N/A"
+  - "null"
+  - "None"
 
-  - id: R3
-    nombre: "Dato Faltante o Inconcluso"
-    campo: "encryption_status"
-    condicion: "is_null"
-    accion: "REVISE_REQUERIDA"
+valores_cifrado_ok:
+  - "Activo"
+  - "Cifrado"
+  - "Enabled"
+  - "Encrypted"
+  - "Completo"
+
+valores_cifrado_no:
+  - "No cifrado"
+  - "Disabled"
+  - "Not encrypted"
+  - "Desactivado"
+
+campos_criticos:
+  - EquipoID
+  - País
+  - Sistema Operativo
+  - Estado de Cifrado
+  - Estado de Cumplimiento
+  - Fuente de Datos
