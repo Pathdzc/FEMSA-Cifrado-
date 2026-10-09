@@ -10,3 +10,6 @@ datos/reales/
 __pycache__/
 *.pyc
 .venv/
+
+# Resultados generados (se pueden volver a crear y pueden venir de datos reales)
+salidas/
