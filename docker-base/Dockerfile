@@ -6,7 +6,7 @@ FROM python:3.11-slim
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
     DATOS_DIR=/app/data \
-    SALIDA_DIR=/app/resultados
+    SALIDA_DIR=/app/resultados \
     REGLAS_PATH=/app/app/reglas.yaml
 
 WORKDIR /app
