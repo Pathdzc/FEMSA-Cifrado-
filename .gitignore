@@ -1,28 +1,19 @@
-# ---------------------------
-# Datos sensibles / entradas locales
-# ---------------------------
-data/*
-!data/.gitkeep
-!data/LEEME.txt
+# Datos reales de FEMSA: NUNCA se suben al repositorio
+datos/reales/
 
-resultados/*
-!resultados/.gitkeep
-
-# Evitar subir datasets reales fuera de carpetas controladas
-*.parquet
-
+# Archivos de entorno y secretos
+.env
+*.key
+*.pem
 
 # Python
 __pycache__/
 *.pyc
-*.pyo
-*.pyd
 .venv/
-venv/
-.env
 
+# Resultados generados (se pueden volver a crear y pueden venir de datos reales)
+salidas/
 
-# OS / IDE
-.DS_Store
-.vscode/
-.idea/
+# Base de datos: contiene datos (reales o simulados)
+datos/bd/
+*.db

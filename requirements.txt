@@ -1,0 +1,6 @@
+# Librerías del proyecto con versión fija.
+# Para agregar o cambiar una, ver las reglas en docs/stack.md.
+pandas==3.0.6        # lectura, limpieza y análisis de datos
+openpyxl==3.1.5      # leer archivos Excel (.xlsx)
+flask==3.1.3         # backend web
+waitress==3.0.2      # servidor para correr Flask dentro de Docker
