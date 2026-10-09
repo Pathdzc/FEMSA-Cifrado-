@@ -1,0 +1,24 @@
+# Dudas para FEMSA y supuestos de trabajo
+Ninguna duda bloquea el avance. Si FEMSA no responde se trabaja con el supuesto indicado y se documenta en el entregable final.
+
+# Dudas importantes
+Cambian el resultado principal del proyecto.
+
+| # | Pregunta | Supuesto si no responden | Qué cambia si el supuesto es incorrecto | Estado |
+|---|---|---|---|---|
+| 1 | ¿Cuál es la fecha de corte del archivo? | Octubre de 2025 (el mes más reciente de "Mes Último Logon"). | Las bandas de recencia y la vigencia de la evidencia. | Pendiente |
+| 2 | ¿Un equipo cumple solo si "Estado de Cifrado" = Encrypted **y** "Tecnología de cifrado State" = Success? | Sí. Un equipo cifrado con otro detalle se reporta como "cifrado fuera de política". | El KPI principal de cumplimiento. | Pendiente |
+| 3 | Los equipos sin información de cifrado ("No disponible", por ejemplo los que solo están en AD), ¿cuentan como incumplimiento? | No se cuentan como cumplimiento ni como incumplimiento: van en una categoría aparte, "sin visibilidad", pero sí cuentan en el universo total. | El porcentaje de cumplimiento y de incumplimiento. | Pendiente |
+| 4 | ¿Qué evalúa "Estado de Cumplimiento" (Compliant / Unknown)? | Es una etiqueta informativa de la fuente. No se usa para calcular el cumplimiento; se reportan sus diferencias con nuestro cálculo. | La comparación entre su etiqueta y nuestro resultado. | Pendiente |
+| 5 | ¿Las 5,563 filas son el universo completo? ¿Los equipos sin actividad en más de 180 días deben contarse? | Sí, todas cuentan. Los inactivos se reportan además como segmento aparte. | El tamaño del universo y los porcentajes. | Pendiente |
+| 6 | ¿Existe una lista de equipos con excepción aprobada (autorizados a no cifrarse)? | No existen excepciones: todo incumplimiento se reporta. | Algunos incumplimientos serían excepciones válidas. | Pendiente |
+
+## Dudas de prioridad media
+
+| # | Pregunta | Supuesto si no responden | Estado |
+|---|---|---|---|
+| 7 | En "Perfil de Privilegio", ¿qué diferencia hay entre "Sin dato" y "No disponible"? | Ambos significan falta de información. | Pendiente |
+| 8 | "Windows 15", "No diponible" e "Iinventario macOS", ¿vienen así de la fuente? | Son errores de captura: se normalizan y se reportan como hallazgo de calidad de datos. | Pendiente |
+| 9 | ¿Qué significan "Estado Hardware" y "Tipo de Red"? | No se usan en las reglas de cumplimiento, solo en análisis descriptivo. | Pendiente |
+| 10 | El archivo solo tiene laptops, ¿el alcance excluye equipos de escritorio? | El alcance son solo laptops. | Pendiente |
+

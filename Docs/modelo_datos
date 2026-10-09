@@ -1,0 +1,90 @@
+# Modelo de datos
+
+Base de datos: SQLite
+Esquema: `db/esquema.sql` · Se crea con `python scripts/crear_bd.py`.
+
+## Diagrama
+
+```mermaid
+erDiagram
+    cargas ||--o{ equipos : contiene
+    cargas ||--o{ resultados : genera
+    equipos ||--o{ resultados : "se evalúa en"
+    cargas ||--o{ reportes : "se documenta en"
+
+    cargas {
+        int id PK
+        text fecha_carga
+        text nombre_archivo
+        text hash_archivo
+        int total_filas
+        text hash_anterior
+        text hash_carga
+    }
+    equipos {
+        int id PK
+        int carga_id FK
+        text equipo_id
+        text usuario_id
+        text pais
+        text estado_cifrado
+        text detalle_cifrado
+        text otras_20_columnas
+    }
+    resultados {
+        int id PK
+        int carga_id FK
+        int equipo_ref FK
+        text regla
+        text cumple
+        text detalle
+        text severidad
+    }
+    reportes {
+        int id PK
+        int carga_id FK
+        text fecha_generacion
+        text alcance
+        text hash_pdf
+        text firma
+    }
+```
+
+## Las cuatro tablas
+
+| Tabla | Qué guarda |
+|---|---|
+| cargas | Un registro por cada archivo subido: cuándo, cuántas filas y el hash SHA-256 del archivo. |
+| equipos | Los 25 campos de cada equipo, exactamente como vinieron en esa carga. |
+| resultados | Cada regla evaluada sobre cada equipo: si cumple, por qué y qué tan grave es. |
+| reportes | Cada PDF generado: su hash y su firma digital. |
+
+Los nombres de columna de la tabla `equipos` están en el campo `nombre_bd` de `docs/diccionario_datos.csv`.
+
+## Decisiones de diseño
+
+1. La evidencia nunca se modifica.
+ La tabla `equipos` guarda los datos tal como llegaron, todos como texto.
+La limpieza y las reglas producen registros nuevos en `resultados`; nunca sobrescriben el dato original.
+Así siempre se puede demostrar de dónde salió cada resultado.
+
+2. El historial es una "foto" completa por carga.
+Cada carga guarda todos sus equipos.
+Es lo más simple y permite comparar cualquier carga contra cualquier otra.
+Estimación de tamaño: unos 5 MB por carga (suponiendo unas 8 reglas por equipo);
+una carga semanal durante un año ocuparía alrededor de 250 MB. La memoria no es un problema.
+
+3. No se impone que EquipoID sea único.
+Si el archivo trae duplicados, se guardan igual y una regla los detecta. Rechazarlos al cargar escondería un hallazgo.
+
+4. Se guardan todas las evaluaciones, no solo las fallas.
+Eso demuestra que se revisó el 100% de los equipos, que es una de las métricas que pidió FEMSA.
+
+5. El hash del archivo queda registrado desde la primera carga.
+Permite comprobar que un resultado corresponde a un archivo específico. 
+ se agregan `hash_anterior` y `hash_carga` para encadenar el historial y detectar si alguien lo altera.
+
+## Seguridad
+
+- El archivo de la base de datos (`datos/bd/`) no se sube al repositorio: contiene los datos.
+- La ruta se configura con la variable de entorno `RUTA_BD`, igual que `ARCHIVO_DATOS`.
