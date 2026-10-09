@@ -1,0 +1,116 @@
+"""
+Perfilado de datos.
+
+Revisa columna por columna: celdas vacías, valores que indican falta de dato,
+valores distintos, espacios extra y duplicados. NO modifica los datos.
+
+Uso (desde la carpeta raíz del proyecto):
+    python scripts/perfilado.py
+
+Resultado: salidas/perfilado.md  (la carpeta salidas/ no se sube al repositorio)
+"""
+import os
+import sys
+
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from config import ARCHIVO_DATOS, COLUMNAS
+from cargar_datos import cargar_datos
+
+SALIDA = "salidas/perfilado.md"
+
+# Valores que significan "no hay dato".
+# "No aplica" NO está aquí: sí es información
+SIN_DATO = ["No disponible", "No diponible", "Sin dato", "No asignado"]
+
+# Columnas identificadoras: no se listan sus valores en el reporte
+COLUMNAS_ID = ["EquipoID", "UsuarioID"]
+
+MAX_VALORES = 30   # si una columna tiene más valores distintos, no se listan
+
+datos = cargar_datos(ARCHIVO_DATOS)
+total = len(datos)
+reporte = []       # el reporte se arma línea por línea
+
+
+def agregar(texto=""):
+    reporte.append(texto)
+
+
+# Resumen general
+agregar("# Perfilado de datos")
+agregar()
+agregar(f"- Archivo: `{os.path.basename(ARCHIVO_DATOS)}`")
+agregar(f"- Filas: {total:,}")
+agregar(f"- Columnas: {len(datos.columns)}")
+agregar(f"- Se consideran sin dato: celdas vacías y {', '.join(SIN_DATO)}")
+agregar()
+
+# ¿Tiene las columnas que esperamos?
+faltan = [c for c in COLUMNAS if c not in datos.columns]
+sobran = [c for c in datos.columns if c not in COLUMNAS]
+
+agregar("## Estructura")
+agregar()
+agregar(f"- Columnas esperadas que faltan: {', '.join(faltan) if faltan else 'ninguna'}")
+agregar(f"- Columnas que no esperábamos: {', '.join(sobran) if sobran else 'ninguna'}")
+agregar()
+
+# Duplicados
+agregar("## Duplicados")
+agregar()
+if "EquipoID" in datos.columns:
+    agregar(f"- EquipoID repetidos: {datos['EquipoID'].duplicated().sum():,}")
+agregar(f"- Filas completamente repetidas: {datos.duplicated().sum():,}")
+agregar()
+
+# Resumen por columna
+agregar("## Resumen por columna")
+agregar()
+agregar("| Columna | Vacías | Sin dato | % sin información | Valores distintos | Con espacios extra |")
+agregar("|---|---|---|---|---|---|")
+
+for columna in datos.columns:
+    valores = datos[columna]
+    limpios = valores.str.strip()
+
+    vacias = (limpios == "").sum()
+    sin_dato = limpios.isin(SIN_DATO).sum()
+    porcentaje = (vacias + sin_dato) / total * 100
+    distintos = valores.nunique()
+    espacios = (valores != limpios).sum()
+
+    agregar(f"| {columna} | {vacias:,} | {sin_dato:,} | {porcentaje:.1f}% | {distintos:,} | {espacios:,} |")
+agregar()
+
+# Valores de cada columna
+agregar("## Valores por columna")
+agregar()
+
+for columna in datos.columns:
+    agregar(f"### {columna}")
+    agregar()
+
+    if columna in COLUMNAS_ID:
+        agregar(f"Columna identificadora: {datos[columna].nunique():,} valores distintos (no se listan).")
+        agregar()
+        continue
+
+    conteo = datos[columna].value_counts()
+    if len(conteo) > MAX_VALORES:
+        agregar(f"{len(conteo):,} valores distintos (demasiados para listar).")
+        agregar()
+        continue
+
+    agregar("| Valor | Filas | % |")
+    agregar("|---|---|---|")
+    for valor, filas in conteo.items():
+        texto = valor if valor != "" else "(vacío)"
+        agregar(f"| {texto} | {filas:,} | {filas / total * 100:.1f}% |")
+    agregar()
+
+# Guardar
+os.makedirs(os.path.dirname(SALIDA), exist_ok=True)
+with open(SALIDA, "w", encoding="utf-8") as archivo:
+    archivo.write("\n".join(reporte))
+
+print(f"Listo: perfilado de {total:,} filas guardado en {SALIDA}")
