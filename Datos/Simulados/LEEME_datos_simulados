@@ -1,0 +1,5 @@
+# Datos simulados
+
+Archivo: `equipos_simulados.csv` · 5,563 filas · 25 columnas · generado con `scripts/generar_datos_simulados.py` (semilla 42).
+
+Ninguna fila viene de los datos reales.
