@@ -6,6 +6,12 @@ services:
     read_only: true            # el contenedor no puede modificar su propio sistema de archivos
     tmpfs:
       - /tmp
+    environment:
+      DATOS_DIR: /app/data
+      SALIDA_DIR: /app/resultados
+      REGLAS_PATH: /app/app/reglas.yaml
     volumes:
       - ./data:/app/data:ro          # datos de entrada, SOLO LECTURA
       - ./resultados:/app/resultados # unico lugar donde el contenedor puede escribir
+    command: ["python", "-m", "app.main"]
+
