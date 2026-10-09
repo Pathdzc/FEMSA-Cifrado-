@@ -1,14 +1,12 @@
-# Excluir todos los archivos de datos
-data/*
-!data/.gitkeep
+# Datos reales de FEMSA: NUNCA se suben al repositorio
+datos/reales/
 
-# Excluir cualquier archivo de datos o reporte sensible
-*.csv
-*.xlsx
-*.parquet
-*.json
+# Archivos de entorno y secretos
+.env
+*.key
+*.pem
 
-# Entorno de desarrollo / Python
+# Python
 __pycache__/
 *.pyc
-.env
+.venv/
