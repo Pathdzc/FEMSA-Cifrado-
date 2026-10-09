@@ -1,0 +1,10 @@
+# Nada de esto debe quedar dentro de la imagen
+.git
+.venv
+__pycache__
+*.pyc
+.env
+datos/reales
+datos/bd
+*.db
+salidas
