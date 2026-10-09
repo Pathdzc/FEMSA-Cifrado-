@@ -2,4 +2,15 @@
 
 Archivo: `equipos_simulados.csv` · 5,563 filas · 25 columnas · generado con `scripts/generar_datos_simulados.py` (semilla 42).
 
-Ninguna fila viene de los datos reales.
+Ninguna fila viene de los datos reales. 
+
+## Cómo se generan
+
+- Cada columna se llena al azar, con la misma probabilidad para cada valor posible.
+- Las columnas son independientes entre sí: no hay supuestos sobre cómo se relacionan.
+- Únicas excepciones, porque son definiciones y no supuestos:
+  - Región se obtiene del País.
+  - Banda Antigüedad se obtiene de Antigüedad Meses.
+- EquipoID son únicos, tomados al azar entre PC-001 y PC-5588.
+
+
