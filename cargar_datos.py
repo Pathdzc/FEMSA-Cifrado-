@@ -2,6 +2,7 @@
 Lee el archivo de datos, sea CSV o Excel.
 
 Todo se lee como TEXTO para no alterar ningún valor
+(por ejemplo, que "No disponible" o una celda vacía no se conviertan en otra cosa).
 """
 import pandas as pd
 
