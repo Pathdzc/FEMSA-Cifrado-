@@ -1,0 +1,21 @@
+version: "1.0"
+reglas_cifrado:
+  - id: R1
+    nombre: "Cifrado Válido"
+    campo: "encryption_status"
+    condicion: "equals"
+    valor: "Encrypted"
+    accion: "MARCAR_CONFORME"
+
+  - id: R2
+    nombre: "Sin Cifrado"
+    campo: "encryption_status"
+    condicion: "equals"
+    valor: "Unencrypted"
+    accion: "MARCAR_NO_CONFORME"
+
+  - id: R3
+    nombre: "Dato Faltante o Inconcluso"
+    campo: "encryption_status"
+    condicion: "is_null"
+    accion: "REVISE_REQUERIDA"
