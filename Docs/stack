@@ -1,0 +1,39 @@
+# Stack tecnológico
+
+| Pieza | Elección | Por qué |
+|---|---|---|
+| Lenguaje | Python 3.12 | pandas 3 requiere Python 3.11 o superior. |
+| Análisis de datos | pandas + openpyxl | Leen CSV y Excel; limpieza y cálculo de KPIs. |
+| Base de datos | SQLite | Un solo archivo, sin servidor; funciona sin internet dentro de Docker. Ver `docs/modelo_datos.md`. |
+| Backend | Flask | simple y suficiente para una herramienta local. |
+| Servidor | waitress | El servidor de desarrollo de Flask no es apto para uso real. waitress funciona igual en Windows, Mac y Linux. |
+| Frontend | HTML + JavaScript | Flask lo sirve directamente, sin herramientas adicionales. |
+| Contenedor | Docker | Requisito de FEMSA: herramienta extraíble que corre en sus máquinas. |
+
+Las versiones exactas están en `requirements.txt`.
+
+## Pendiente de definir
+
+| Pieza | Cuándo | Nota |
+|---|---|---|
+| Hash SHA-256 | Semana 2 | Se usa `hashlib`, que ya viene con Python. |
+| Firma digital (Ed25519) | Semana 5 | Librería `cryptography`. |
+| Generación de PDF | Semana 5 | Confirmar con el profesor qué herramienta mencionó |
+| Gráficas del dashboard | Semana 4 | Librería de JavaScript guardada dentro del proyecto. |
+
+## Instalación para desarrollo (sin Docker)
+
+```
+python -m venv .venv
+# Windows:   .venv\Scripts\activate
+# Mac/Linux: source .venv/bin/activate
+pip install -r requirements.txt
+```
+
+## Reglas para el equipo
+
+1. Versiones fijas. Toda librería va en `requirements.txt` con su versión exacta (`==`).
+2. Nada recién publicado. No usar versiones publicadas hace menos de dos semanas: a veces salen con errores o con código malicioso.
+3. Revisar vulnerabilidades antes de cada entrega: `pip install pip-audit` y luego `pip-audit -r requirements.txt`.
+4. Sin conexiones externas.La herramienta corre en las máquinas de FEMSA sin internet: nada de librerías cargadas desde CDN, APIs externas ni agentes instalados.
+5. Nunca criptografía propia. Solo librerías reconocidas (`hashlib`, `cryptography`).
