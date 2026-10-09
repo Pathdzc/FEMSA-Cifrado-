@@ -1,87 +1,84 @@
-import os
 import random
+from pathlib import Path
 import pandas as pd
-import numpy as np
+import os
 
-def generar_datos_simulados(num_registros=20000):
-    np.random.seed(42)
-    random.seed(42)
+SALIDA = Path(os.environ.get("SALIDA_DIR", "/app/resultados"))
+random.seed(42)
 
-    paises = ["México", "Colombia", "Brasil", "Argentina", "Chile"]
-    regiones = ["NORTE", "SUR", "CENTRO", "LATAM"]
-    sistemas_operativos = ["Windows 11", "Windows 10", "macOS Sonoma", "macOS Ventura"]
-    versiones_so = ["10.0.19045", "10.0.22631", "14.2.1", "13.6.3"]
-    tpm_estados = ["Ready", "Not Ready", "Disabled", "N/A"]
-    readiness = ["Ready", "Not Ready", "Unknown"]
-    estados_cifrado = ["Encrypted", "Unencrypted", "Pending", "Unknown"]
-    tecnologias_cifrado = ["BitLocker", "FileVault", "None"]
-    cumplimiento_estados = ["Compliant", "Non-Compliant", "Pending"]
-    categorias = ["Laptop", "Desktop", "Workstation"]
-    clases = ["Standard", "VIP", "Critical"]
-    perfiles_privilegio = ["User", "Admin", "Domain Admin"]
-    estados_cuenta = ["Active", "Inactive", "Disabled"]
-    recencia_bandas = ["0-30 días", "31-60 días", "61-90 días", ">90 días"]
-    hardware_estados = ["Good", "Fair", "Deprecated"]
-    red_tipos = ["VPN", "Corporate Wi-Fi", "Ethernet", "Public"]
-    fuentes = ["Intune", "Jamf", "Active Directory", "SCCM"]
 
-    data = []
+def generar_dataset(n=5000):
+    paises = ["México", "Brasil", "Colombia", "Argentina", "Chile"]
+    regiones = ["Norte", "Sur", "Centro"]
+    so_list = ["Windows 10", "Windows 11", "macOS Ventura", "macOS Sonoma"]
+    versiones = ["22H2", "23H2", "13", "14"]
+    tpm = ["Habilitado", "Deshabilitado", "No disponible"]
+    readiness = ["Listo", "No listo", "No disponible"]
+    estado_cifrado = ["Activo", "No cifrado", "No disponible"]
+    tecnologia = ["BitLocker", "FileVault", "No disponible"]
+    cumplimiento = ["Cumple", "No cumple", "No disponible"]
+    categoria = ["Laptop", "Desktop", "No disponible"]
+    clase = ["Corporativo", "Operativo", "Ejecutivo"]
+    perfil = ["Estándar", "Privilegiado", "No disponible"]
+    banda_antig = ["0-12", "13-24", "25-36", "No disponible"]
+    estado_cuenta = ["Activa", "Inactiva"]
+    ultimo_logon = ["2026-10", "2026-09", "2026-08", "2026-07", "No disponible"]
+    banda_recencia = ["0-30 días", "31-60 días", "61-90 días", "No disponible"]
+    estado_hw = ["Vigente", "Obsoleto", "No disponible"]
+    tipo_red = ["Corporativa", "Remota", "No disponible"]
+    fuente = ["MDM", "AD", "MacOS", "Consolidado"]
+    si_no = ["Sí", "No"]
 
-    for i in range(1, num_registros + 1):
-        so = np.random.choice(sistemas_operativos)
-        es_mac = "macOS" in so
-        
-        cifrado = np.random.choice(estados_cifrado, p=[0.70, 0.18, 0.07, 0.05])
-        
-        if es_mac:
-            tec = "FileVault" if cifrado == "Encrypted" else "None"
-            en_mdm = np.random.choice([True, False], p=[0.85, 0.15])
-            en_ad = np.random.choice([True, False], p=[0.30, 0.70])
-            en_macos = True
-        else:
-            tec = "BitLocker" if cifrado == "Encrypted" else "None"
-            en_mdm = np.random.choice([True, False], p=[0.90, 0.10])
-            en_ad = np.random.choice([True, False], p=[0.95, 0.05])
-            en_macos = False
+    rows = []
 
-        row = {
-            "EquipoID": f"EQ-{100000 + i}",
-            "UsuarioID": f"USR-{random.randint(10000, 99999)}",
-            "País": np.random.choice(paises),
-            "Región": np.random.choice(regiones),
-            "Sistema Operativo": so,
-            "Versión SO": np.random.choice(versiones_so),
-            "Estado TPM": "N/A" if es_mac else np.random.choice(tpm_estados, p=[0.8, 0.1, 0.05, 0.05]),
-            "Encryption Readiness": np.random.choice(readiness),
-            "Estado de Cifrado": cifrado,
-            "Tecnología de cifrado State": tec,
-            "Estado de Cumplimiento": np.random.choice(cumplimiento_estados),
-            "Categoría de Equipo": np.random.choice(categorias),
-            "Clase de Equipo": np.random.choice(clases),
-            "Perfil de Privilegio": np.random.choice(perfiles_privilegio),
-            "Antigüedad Meses": random.randint(1, 60),
-            "Banda Antigüedad": np.random.choice(["0-12m", "13-24m", "25-36m", ">36m"]),
-            "Estado de Cuenta": np.random.choice(estados_cuenta),
-            "Mes Último Logon": f"2026-0{random.randint(1, 9)}",
-            "Banda Recencia": np.random.choice(recencia_bandas),
-            "Estado Hardware": np.random.choice(hardware_estados),
-            "Tipo de Red": np.random.choice(red_tipos),
-            "Fuente de Datos": np.random.choice(fuentes),
-            "En MDM": en_mdm,
-            "En AD": en_ad,
-            "En MacOS": en_macos
-        }
-        data.append(row)
+    for i in range(1, n + 1):
+        os_name = random.choice(so_list)
+        rows.append({
+            "EquipoID": f"PC-{i}",
+            "UsuarioID": random.choice([f"U-{random.randint(1000,9999)}", "No asignado"]),
+            "País": random.choice(paises),
+            "Región": random.choice(regiones),
+            "Sistema Operativo": os_name,
+            "Versión SO": random.choice(versiones),
+            "Estado TPM": random.choices(tpm, weights=[60, 15, 25])[0],
+            "Encryption Readiness": random.choices(readiness, weights=[60, 20, 20])[0],
+            "Estado de Cifrado": random.choices(estado_cifrado, weights=[65, 20, 15])[0],
+            "Tecnología de cifrado State": "FileVault" if "macOS" in os_name else random.choice(tecnologia),
+            "Estado de Cumplimiento": random.choices(cumplimiento, weights=[60, 25, 15])[0],
+            "Categoría de Equipo": random.choice(categoria),
+            "Clase de Equipo": random.choice(clase),
+            "Perfil de Privilegio": random.choice(perfil),
+            "Antigüedad Meses": random.choice([random.randint(1, 48), None, None]),
+            "Banda Antigüedad": random.choice(banda_antig),
+            "Estado de Cuenta": random.choices(estado_cuenta, weights=[85, 15])[0],
+            "Mes Último Logon": random.choice(ultimo_logon),
+            "Banda Recencia": random.choice(banda_recencia),
+            "Estado Hardware": random.choice(estado_hw),
+            "Tipo de Red": random.choice(tipo_red),
+            "Fuente de Datos": random.choice(fuente),
+            "En MDM": random.choice(si_no),
+            "En AD": random.choice(si_no),
+            "En MacOS": "Sí" if "macOS" in os_name and random.random() > 0.2 else "No",
+        })
 
-    df = pd.DataFrame(data)
+    df = pd.DataFrame(rows)
 
-    output_dir = os.getenv("DATOS_DIR", "/app/data")
-    raw_path = os.path.join(output_dir, "raw")
-    os.makedirs(raw_path, exist_ok=True)
+    # anomalías controladas
+    for idx in random.sample(range(len(df)), 50):
+        df.loc[idx, "EquipoID"] = "INVALIDO"
 
-    filepath = os.path.join(raw_path, "dataset_simulado_femsa.csv")
-    df.to_csv(filepath, index=False)
-    print(f"[+] Dataset simulado de 20,000 registros creado exitosamente en: {filepath}")
+    for idx in random.sample(range(len(df)), 120):
+        df.loc[idx, "Estado de Cifrado"] = "No disponible"
+
+    for idx in random.sample(range(len(df)), 100):
+        df.loc[idx, "Estado TPM"] = "No disponible"
+
+    return df
+
 
 if __name__ == "__main__":
-    generar_datos_simulados()
+    SALIDA.mkdir(parents=True, exist_ok=True)
+    df = generar_dataset(5000)
+    archivo = SALIDA / "datos_simulados.csv"
+    df.to_csv(archivo, index=False, encoding="utf-8-sig")
+    print(f"Datos simulados generados en: {archivo}")
