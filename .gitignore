@@ -1,0 +1,14 @@
+# Excluir todos los archivos de datos
+data/*
+!data/.gitkeep
+
+# Excluir cualquier archivo de datos o reporte sensible
+*.csv
+*.xlsx
+*.parquet
+*.json
+
+# Entorno de desarrollo / Python
+__pycache__/
+*.pyc
+.env
