@@ -13,3 +13,7 @@ __pycache__/
 
 # Resultados generados (se pueden volver a crear y pueden venir de datos reales)
 salidas/
+
+# Base de datos: contiene datos (reales o simulados)
+datos/bd/
+*.db
