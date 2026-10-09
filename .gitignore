@@ -1,14 +1,28 @@
-# Excluir todos los archivos de datos
+# ---------------------------
+# Datos sensibles / entradas locales
+# ---------------------------
 data/*
 !data/.gitkeep
+!data/LEEME.txt
 
-# Excluir cualquier archivo de datos o reporte sensible
-*.csv
-*.xlsx
+resultados/*
+!resultados/.gitkeep
+
+# Evitar subir datasets reales fuera de carpetas controladas
 *.parquet
-*.json
 
-# Entorno de desarrollo / Python
+
+# Python
 __pycache__/
 *.pyc
+*.pyo
+*.pyd
+.venv/
+venv/
 .env
+
+
+# OS / IDE
+.DS_Store
+.vscode/
+.idea/
