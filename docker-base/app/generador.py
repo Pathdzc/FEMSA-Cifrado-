@@ -8,9 +8,6 @@ import numpy as np
 import pandas as pd
 
 # --------------------------------------------------------------------------
-# Catálogos. Son SUPUESTOS: cuando se conozcan los valores reales (perfilado
-# del archivo real), se ajustan aquí y en reglas.yaml.
-# --------------------------------------------------------------------------
 PAISES = {
     # país: (peso en el parque, región, probabilidad de macOS)
     "México": (0.42, "Norteamérica", 0.10),
