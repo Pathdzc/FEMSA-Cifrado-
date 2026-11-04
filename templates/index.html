@@ -4,12 +4,37 @@
 {% block content %}
 <h2>Dashboard principal</h2>
 
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    {% for category, message in messages %}
+      <div class="alert {{ category }}">
+        {{ message }}
+      </div>
+    {% endfor %}
+  {% endif %}
+{% endwith %}
+
 <div class="card">
-    <p><strong>Archivo:</strong> {{ archivo }}</p>
-    <p><strong>Filas:</strong> {{ filas }}</p>
-    <p><strong>Columnas:</strong> {{ columnas }}</p>
-    <p><strong>Estructura esperada:</strong> {{ "Sí" if columnas_ok else "No, revisar el perfilado" }}</p>
+    <h3>Subir archivo</h3>
+    <form method="post" enctype="multipart/form-data" class="upload-form">
+        <input type="file" name="archivo" accept=".csv,.xlsx,.xls" required>
+        <button type="submit">Cargar y evaluar</button>
+    </form>
+    <p class="hint">Formatos permitidos: CSV, XLSX, XLS.</p>
 </div>
+
+{% if archivo_info %}
+<div class="card">
+    <p><strong>Archivo:</strong> {{ archivo_info.archivo }}</p>
+    <p><strong>Filas:</strong> {{ archivo_info.filas }}</p>
+    <p><strong>Columnas:</strong> {{ archivo_info.columnas }}</p>
+    <p><strong>Estructura esperada:</strong> {{ "Sí" if archivo_info.columnas_ok else "No, revisar el perfilado" }}</p>
+</div>
+{% else %}
+<div class="alert">
+    Aún no se ha cargado ningún archivo para evaluación.
+</div>
+{% endif %}
 
 {% if resumen %}
     <h3>Resumen del universo</h3>
@@ -40,12 +65,6 @@
                 <small>{{ estado }} ({{ data.porcentaje }}%)</small>
             </div>
         {% endfor %}
-    </div>
-{% else %}
-    <div class="alert">
-        No se encontró <code>salidas/resumen_reglas.json</code>.  
-        Corre primero:
-        <pre>python scripts/evaluar.py</pre>
     </div>
 {% endif %}
 {% endblock %}
