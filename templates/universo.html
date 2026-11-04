@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% block title %}Universo conciliado{% endblock %}
+
+{% block content %}
+<h2>Universo conciliado</h2>
+
+{% if universo is not none %}
+<form method="get" class="filters">
+    <select name="estado_control">
+        <option value="">Todos los estados</option>
+        {% for e in filtros.estados %}
+            <option value="{{ e }}" {% if filtros.estado_control == e %}selected{% endif %}>{{ e }}</option>
+        {% endfor %}
+    </select>
+
+    <select name="pais">
+        <option value="">Todos los países</option>
+        {% for p in filtros.paises %}
+            <option value="{{ p }}" {% if filtros.pais == p %}selected{% endif %}>{{ p }}</option>
+        {% endfor %}
+    </select>
+
+    <select name="so">
+        <option value="">Todos los sistemas</option>
+        {% for s in filtros.sistemas %}
+            <option value="{{ s }}" {% if filtros.so == s %}selected{% endif %}>{{ s }}</option>
+        {% endfor %}
+    </select>
+
+    <button type="submit">Filtrar</button>
+</form>
+
+<p><strong>Total filtrado:</strong> {{ total }}</p>
+
+<div class="table-wrap">
+<table>
+    <thead>
+        <tr>
+            <th>EquipoID</th>
+            <th>País</th>
+            <th>SO</th>
+            <th>Fuente de Datos</th>
+            <th>Cobertura</th>
+            <th>Estado de control</th>
+            <th>Registros</th>
+            <th>Reglas fallidas</th>
+            <th>Severidad máxima</th>
+        </tr>
+    </thead>
+    <tbody>
+    {% for row in universo %}
+        <tr>
+            <td>{{ row["EquipoID"] }}</td>
+            <td>{{ row["País"] }}</td>
+            <td>{{ row["Sistema Operativo"] }}</td>
+            <td>{{ row["Fuente de Datos"] }}</td>
+            <td>{{ row["cobertura"] }}</td>
+            <td>{{ row["estado_control"] }}</td>
+            <td>{{ row["registros_en_archivo"] }}</td>
+            <td>{{ row.get("reglas_fallidas", "") }}</td>
+            <td>{{ row.get("severidad_maxima", "") }}</td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+</div>
+{% else %}
+<div class="alert">
+    No se encontró <code>salidas/universo_conciliado.csv</code>.  
+    Corre primero:
+    <pre>python scripts/evaluar.py</pre>
+</div>
+{% endif %}
+{% endblock %}
