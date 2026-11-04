@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}FEMSA Cifrado{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <header class="topbar">
+        <div class="brand">
+            <h1>FEMSA · Discos Duros Cifrados</h1>
+            <p>Monitoreo local del control de cifrado</p>
+        </div>
+        <nav>
+            <a href="{{ url_for('inicio') }}">Dashboard</a>
+            <a href="{{ url_for('universo') }}">Universo</a>
+            <a href="{{ url_for('reglas') }}">Reglas</a>
+            <a href="{{ url_for('cobertura') }}">Cobertura</a>
+        </nav>
+    </header>
+
+    <main class="container">
+        {% block content %}{% endblock %}
+    </main>
+</body>
+</html>
