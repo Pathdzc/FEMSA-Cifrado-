@@ -199,6 +199,7 @@ def graficas():
 
     estados = df["estado_control"].value_counts()
     tabla_pais = pd.crosstab(df["País"], df["estado_control"])
+    tabla_so = pd.crosstab(df["Sistema Operativo"], df["estado_control"])
 
     datos = {
         "estados": {
@@ -210,6 +211,13 @@ def graficas():
             "estados": {
                 estado: [int(v) for v in tabla_pais[estado]]
                 for estado in tabla_pais.columns
+            },
+        },
+        "por_so": {
+            "sistemas": tabla_so.index.tolist(),
+            "estados": {
+                estado: [int(v) for v in tabla_so[estado]]
+                for estado in tabla_so.columns
             },
         },
     }

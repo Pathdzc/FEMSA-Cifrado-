@@ -17,6 +17,11 @@
   <div id="g-pais"></div>
 </div>
 
+<div class="card">
+  <h3>Estado de control por sistema operativo</h3>
+  <div id="g-so"></div>
+</div>
+
 <script src="{{ url_for('static', filename='plotly.min.js') }}"></script>
 <script>
   const datos = {{ datos | tojson }};
@@ -47,6 +52,21 @@
     }));
 
   Plotly.newPlot("g-pais", trazasPais, {
+    barmode: "stack",
+    margin: { t: 20 },
+    yaxis: { title: "Equipos" }
+  }, { responsive: true });
+    const trazasSO = Object.keys(colores)
+    .filter(e => datos.por_so.estados[e])
+    .map(e => ({
+      type: "bar",
+      name: e,
+      x: datos.por_so.sistemas,
+      y: datos.por_so.estados[e],
+      marker: { color: colores[e] }
+    }));
+
+  Plotly.newPlot("g-so", trazasSO, {
     barmode: "stack",
     margin: { t: 20 },
     yaxis: { title: "Equipos" }
