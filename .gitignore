@@ -17,3 +17,6 @@ salidas/
 # Base de datos: contiene datos (reales o simulados)
 datos/bd/
 *.db
+
+uploads/*
+!uploads/.gitkeep
