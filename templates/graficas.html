@@ -7,6 +7,35 @@
 {% if not datos %}
 <div class="alert">Primero carga un archivo en el Dashboard.</div>
 {% else %}
+
+<form method="get" class="card" style="display:flex; gap:12px; flex-wrap:wrap; align-items:center;">
+  <select name="pais">
+    <option value="">Todos los países</option>
+    {% for p in filtros.paises %}
+    <option value="{{ p }}" {% if p == filtros.pais %}selected{% endif %}>{{ p }}</option>
+    {% endfor %}
+  </select>
+
+  <select name="so">
+    <option value="">Todos los sistemas</option>
+    {% for s in filtros.sistemas %}
+    <option value="{{ s }}" {% if s == filtros.so %}selected{% endif %}>{{ s }}</option>
+    {% endfor %}
+  </select>
+
+  <select name="fuente">
+    <option value="">Todas las fuentes</option>
+    {% for f in filtros.fuentes %}
+    <option value="{{ f }}" {% if f == filtros.fuente %}selected{% endif %}>{{ f }}</option>
+    {% endfor %}
+  </select>
+
+  <button type="submit">Filtrar</button>
+  <a href="{{ url_for('graficas') }}">Limpiar</a>
+</form>
+
+<p><strong>Equipos en la selección:</strong> {{ total }}</p>
+
 <div class="card">
   <h3>Estado de control</h3>
   <div id="g-estados"></div>
@@ -23,7 +52,7 @@
 </div>
 
 <div class="card">
-  <h3>Resultados por regla</h3>
+ <h3>Resultados por regla (todo el universo)</h3>
   <div id="g-reglas"></div>
 </div>
 

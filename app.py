@@ -195,11 +195,32 @@ def cobertura():
 def graficas():
     df = cargar_universo()
     if df is None:
-        return render_template("graficas.html", datos=None)
+        return render_template("graficas.html", datos=None, filtros={}, total=0)
+
+    pais = request.args.get("pais", "")
+    so = request.args.get("so", "")
+    fuente = request.args.get("fuente", "")
+
+    filtros = {
+        "pais": pais,
+        "so": so,
+        "fuente": fuente,
+        "paises": sorted(df["País"].dropna().unique().tolist()),
+        "sistemas": sorted(df["Sistema Operativo"].dropna().unique().tolist()),
+        "fuentes": sorted(df["Fuente de Datos"].dropna().unique().tolist()),
+    }
+
+    if pais:
+        df = df[df["País"] == pais]
+    if so:
+        df = df[df["Sistema Operativo"] == so]
+    if fuente:
+        df = df[df["Fuente de Datos"] == fuente]
 
     estados = df["estado_control"].value_counts()
     tabla_pais = pd.crosstab(df["País"], df["estado_control"])
     tabla_so = pd.crosstab(df["Sistema Operativo"], df["estado_control"])
+
     resumen = cargar_resumen()
     reglas = resumen.get("reglas", []) if resumen else []
 
@@ -208,7 +229,7 @@ def graficas():
             "labels": estados.index.tolist(),
             "values": [int(v) for v in estados.values],
         },
-                "por_pais": {
+        "por_pais": {
             "paises": tabla_pais.index.tolist(),
             "estados": {
                 estado: [int(v) for v in tabla_pais[estado]]
@@ -222,7 +243,7 @@ def graficas():
                 for estado in tabla_so.columns
             },
         },
-                "reglas": {
+        "reglas": {
             "nombres": [f'{r["regla"]} · {r["nombre_regla"]}' for r in reglas],
             "Sí": [int(r.get("Sí", 0) or 0) for r in reglas],
             "No": [int(r.get("No", 0) or 0) for r in reglas],
@@ -230,7 +251,8 @@ def graficas():
             "No aplica": [int(r.get("No aplica", 0) or 0) for r in reglas],
         },
     }
-    return render_template("graficas.html", datos=datos)
+
+    return render_template("graficas.html", datos=datos, filtros=filtros, total=len(df))
 
 if __name__ == "__main__":
     app.run(debug=True)
