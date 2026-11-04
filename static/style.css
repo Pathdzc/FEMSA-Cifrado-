@@ -176,3 +176,47 @@ pre {
 .alert.error {
     border-left: 6px solid #c0392b;
 }
+
+/* ===== Dashboard estilo FEMSA ===== */
+:root {
+  --femsa-rojo: #9D2736;
+}
+
+.dash-header h2 { font-size: 2rem; margin: 0; color: #111; }
+.dash-sub { color: #666; font-style: italic; margin: 6px 0 0; }
+.rojo { color: var(--femsa-rojo); }
+
+.dash-linea { height: 3px; background: var(--femsa-rojo); margin: 24px 0; border-radius: 2px; }
+
+.dash-filtros { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; margin-top: 18px; }
+.dash-filtros select {
+  padding: 9px 14px; border: 1px solid #ddd; border-radius: 8px;
+  background: #fff; font-size: 0.95rem; color: #333;
+}
+.dash-filtros button {
+  padding: 9px 20px; border: none; border-radius: 8px;
+  background: var(--femsa-rojo); color: #fff; font-weight: 600; cursor: pointer;
+}
+.dash-filtros a { color: #555; }
+
+.dash-kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; }
+.kpi {
+  background: #fff; border-radius: 12px; padding: 26px 16px; text-align: center;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+}
+.kpi-num { display: block; font-size: 2.8rem; font-weight: 300; color: #333; }
+.kpi-label { display: block; font-size: 1.05rem; color: #555; margin-top: 4px; }
+.kpi .rojo { color: var(--femsa-rojo); }
+
+.dash-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.dash-card {
+  background: #fff; border-radius: 12px; padding: 20px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+}
+.dash-card.ancho { grid-column: 1 / -1; }
+.dash-card h3 { margin: 0 0 8px; font-weight: 500; color: #222; }
+.dash-card h3 small { color: #888; font-weight: 400; }
+
+@media (max-width: 900px) {
+  .dash-grid { grid-template-columns: 1fr; }
+}

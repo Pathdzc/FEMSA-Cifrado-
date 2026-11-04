@@ -195,7 +195,7 @@ def cobertura():
 def graficas():
     df = cargar_universo()
     if df is None:
-        return render_template("graficas.html", datos=None, filtros={}, total=0)
+        return render_template("graficas.html", datos=None, filtros={}, total=0, kpis={})
 
     pais = request.args.get("pais", "")
     so = request.args.get("so", "")
@@ -251,8 +251,25 @@ def graficas():
             "No aplica": [int(r.get("No aplica", 0) or 0) for r in reglas],
         },
     }
+    total = len(df)
+    conteo = df["estado_control"].value_counts()
 
-    return render_template("graficas.html", datos=datos, filtros=filtros, total=len(df))
+    def pct(n):
+        return round(100 * n / total, 1) if total else 0
+
+    cifrados = (
+        conteo.get("Cifrado fuera de política", 0)
+        + conteo.get("Cifrado, política sin verificar", 0)
+        + conteo.get("Cumple", 0)
+    )
+    kpis = {
+        "total": total,
+        "cifrado": pct(int(cifrados)),
+        "cumple": pct(int(conteo.get("Cumple", 0))),
+        "sin_visibilidad": pct(int(conteo.get("Sin visibilidad", 0))),
+    }
+
+    return render_template("graficas.html", datos=datos, filtros=filtros, total=total, kpis=kpis)
 
 if __name__ == "__main__":
     app.run(debug=True)

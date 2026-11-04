@@ -1,58 +1,81 @@
 {% extends "base.html" %}
-{% block title %}Gráficas{% endblock %}
+{% block title %}Dashboard de cifrado{% endblock %}
 
 {% block content %}
-<h2>Gráficas</h2>
-
 {% if not datos %}
 <div class="alert">Primero carga un archivo en el Dashboard.</div>
 {% else %}
 
-<form method="get" class="card" style="display:flex; gap:12px; flex-wrap:wrap; align-items:center;">
+<div class="dash-header">
+  <h2>Control de Cifrado de Discos | <span class="rojo">FEMSA</span></h2>
+  <p class="dash-sub">Monitoreo del universo de equipos · {{ kpis.total }} equipos en la selección</p>
+</div>
+
+<form method="get" class="dash-filtros">
   <select name="pais">
     <option value="">Todos los países</option>
     {% for p in filtros.paises %}
     <option value="{{ p }}" {% if p == filtros.pais %}selected{% endif %}>{{ p }}</option>
     {% endfor %}
   </select>
-
   <select name="so">
     <option value="">Todos los sistemas</option>
     {% for s in filtros.sistemas %}
     <option value="{{ s }}" {% if s == filtros.so %}selected{% endif %}>{{ s }}</option>
     {% endfor %}
   </select>
-
   <select name="fuente">
     <option value="">Todas las fuentes</option>
     {% for f in filtros.fuentes %}
     <option value="{{ f }}" {% if f == filtros.fuente %}selected{% endif %}>{{ f }}</option>
     {% endfor %}
   </select>
-
   <button type="submit">Filtrar</button>
   <a href="{{ url_for('graficas') }}">Limpiar</a>
 </form>
 
-<p><strong>Equipos en la selección:</strong> {{ total }}</p>
+<div class="dash-linea"></div>
 
-<div class="card">
-  <h3>Estado de control</h3>
-  <div id="g-estados"></div>
+<div class="dash-kpis">
+  <div class="kpi">
+    <span class="kpi-num">{{ kpis.total }}</span>
+    <span class="kpi-label">Equipos</span>
+  </div>
+  <div class="kpi">
+    <span class="kpi-num">{{ kpis.cifrado }}%</span>
+    <span class="kpi-label">Discos cifrados</span>
+  </div>
+  <div class="kpi">
+    <span class="kpi-num rojo">{{ kpis.cumple }}%</span>
+    <span class="kpi-label rojo">Cumple la política</span>
+  </div>
+  <div class="kpi">
+    <span class="kpi-num rojo">{{ kpis.sin_visibilidad }}%</span>
+    <span class="kpi-label rojo">Sin visibilidad</span>
+  </div>
 </div>
 
-<div class="card">
-  <h3>Estado de control por país</h3>
-  <div id="g-pais"></div>
+<div class="dash-linea"></div>
+
+<div class="dash-grid">
+  <div class="dash-card">
+    <h3>Estado de control</h3>
+    <div id="g-estados"></div>
+  </div>
+  <div class="dash-card">
+    <h3>Por sistema operativo</h3>
+    <div id="g-so"></div>
+  </div>
+  <div class="dash-card ancho">
+    <h3>Por país</h3>
+    <div id="g-pais"></div>
+  </div>
 </div>
 
-<div class="card">
-  <h3>Estado de control por sistema operativo</h3>
-  <div id="g-so"></div>
-</div>
+<div class="dash-linea"></div>
 
-<div class="card">
- <h3>Resultados por regla (todo el universo)</h3>
+<div class="dash-card">
+  <h3>Resultados por regla <small>(todo el universo)</small></h3>
   <div id="g-reglas"></div>
 </div>
 
@@ -61,56 +84,60 @@
   const datos = {{ datos | tojson }};
 
   const colores = {
-    "No cifrado": "#c0392b",
-    "Sin visibilidad": "#7f8c8d",
-    "Cifrado fuera de política": "#e67e22",
-    "Cifrado, política sin verificar": "#f1c40f",
-    "Cumple": "#27ae60"
+    "No cifrado": "#9D2736",
+    "Cifrado fuera de política": "#D9939B",
+    "Sin visibilidad": "#6b6b6b",
+    "Cifrado, política sin verificar": "#bdbdbd",
+    "Cumple": "#2b2b2b"
   };
+
+  const coloresReglas = {
+    "Sí": "#8c8c8c",
+    "No": "#9D2736",
+    "Sin información": "#c4c4c4",
+    "No aplica": "#e8e8e8"
+  };
+
+  const base = {
+    paper_bgcolor: "rgba(0,0,0,0)",
+    plot_bgcolor: "rgba(0,0,0,0)",
+    font: { family: "-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif", color: "#555", size: 13 },
+    margin: { t: 40, r: 10, b: 40, l: 50 },
+    legend: { orientation: "h", y: 1.15 }
+  };
+  const config = { displayModeBar: false, responsive: true };
 
   Plotly.newPlot("g-estados", [{
     type: "pie",
-    labels: datos.estados.labels, 
+    labels: datos.estados.labels,
     values: datos.estados.values,
-    hole: 0.4,
+    hole: 0.55,
+    sort: false,
+    textinfo: "percent",
     marker: { colors: datos.estados.labels.map(e => colores[e] || "#999") }
-  }], { margin: { t: 20 } }, { responsive: true });
-    const trazasPais = Object.keys(colores)
-    .filter(e => datos.por_pais.estados[e])
-    .map(e => ({
-      type: "bar",
-      name: e,
-      x: datos.por_pais.paises,
-      y: datos.por_pais.estados[e],
-      marker: { color: colores[e] }
-    }));
+  }], { ...base, showlegend: true, height: 380 }, config);
 
-  Plotly.newPlot("g-pais", trazasPais, {
-    barmode: "stack",
-    margin: { t: 20 },
-    yaxis: { title: "Equipos" }
-  }, { responsive: true });
-    const trazasSO = Object.keys(colores)
-    .filter(e => datos.por_so.estados[e])
-    .map(e => ({
-      type: "bar",
-      name: e,
-      x: datos.por_so.sistemas,
-      y: datos.por_so.estados[e],
-      marker: { color: colores[e] }
-    }));
+  function barrasApiladas(id, categorias, estados, alto) {
+    const trazas = Object.keys(colores)
+      .filter(e => estados[e])
+      .map(e => ({
+        type: "bar",
+        name: e,
+        x: categorias,
+        y: estados[e],
+        marker: { color: colores[e] }
+      }));
+    Plotly.newPlot(id, trazas, {
+      ...base,
+      barmode: "stack",
+      height: alto,
+      yaxis: { title: "Equipos", gridcolor: "#eee" },
+      bargap: 0.35
+    }, config);
+  }
 
-  Plotly.newPlot("g-so", trazasSO, {
-    barmode: "stack",
-    margin: { t: 20 },
-    yaxis: { title: "Equipos" }
-  }, { responsive: true });
-    const coloresReglas = {
-    "Sí": "#27ae60",
-    "No": "#c0392b",
-    "Sin información": "#7f8c8d",
-    "No aplica": "#d5d8dc"
-  };
+  barrasApiladas("g-so", datos.por_so.sistemas, datos.por_so.estados, 380);
+  barrasApiladas("g-pais", datos.por_pais.paises, datos.por_pais.estados, 420);
 
   const trazasReglas = Object.keys(coloresReglas).map(r => ({
     type: "bar",
@@ -122,12 +149,12 @@
   }));
 
   Plotly.newPlot("g-reglas", trazasReglas, {
+    ...base,
     barmode: "stack",
-    height: 550,
-    margin: { t: 20},
-    xaxis: { title: "Equipos" },
+    height: 560,
+    xaxis: { title: "Equipos", gridcolor: "#eee" },
     yaxis: { autorange: "reversed", automargin: true }
-  }, { responsive: true });
+  }, config);
 </script>
 {% endif %}
 {% endblock %}
