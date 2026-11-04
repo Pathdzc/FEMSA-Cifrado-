@@ -1,32 +1,196 @@
-"""
-Aplicación web: esqueleto de la semana 1.
-
-Por ahora solo comprueba que todo funciona: lee el archivo de datos
-y muestra cuántas filas y columnas tiene. No muestra ningún dato.
-
-Correr sin Docker:   flask --app app run
-Correr con Docker:   docker compose up --build
-Después abrir:       http://localhost:5000
-"""
 import os
-from flask import Flask
-from markupsafe import escape
-from config import ARCHIVO_DATOS, COLUMNAS
+import json
+import subprocess
+import pandas as pd
+
+from flask import Flask, render_template, request, redirect, url_for, flash
+from werkzeug.utils import secure_filename
+
+from config import COLUMNAS
 from cargar_datos import cargar_datos
 
 app = Flask(__name__)
+app.secret_key = "femsa-local-secret"
+
+UPLOAD_FOLDER = "uploads"
+SALIDAS_DIR = "salidas"
+ALLOWED_EXTENSIONS = {"csv", "xlsx", "xls"}
+
+app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
+app.config["MAX_CONTENT_LENGTH"] = 30 * 1024 * 1024  # 30 MB
 
 
-@app.route("/")
+def allowed_file(filename):
+    return "." in filename and filename.rsplit(".", 1)[1].lower() in ALLOWED_EXTENSIONS
+
+
+def cargar_resumen():
+    ruta = os.path.join(SALIDAS_DIR, "resumen_reglas.json")
+    if not os.path.exists(ruta):
+        return None
+    with open(ruta, "r", encoding="utf-8") as f:
+        return json.load(f)
+
+
+def cargar_universo():
+    ruta = os.path.join(SALIDAS_DIR, "universo_conciliado.csv")
+    if not os.path.exists(ruta):
+        return None
+    return pd.read_csv(ruta)
+
+
+def cargar_resultados():
+    ruta = os.path.join(SALIDAS_DIR, "resultados_reglas.csv")
+    if not os.path.exists(ruta):
+        return None
+    return pd.read_csv(ruta)
+
+
+def info_archivo_actual(ruta_archivo):
+    if not ruta_archivo or not os.path.exists(ruta_archivo):
+        return None
+
+    datos = cargar_datos(ruta_archivo)
+    return {
+        "archivo": os.path.basename(ruta_archivo),
+        "filas": len(datos),
+        "columnas": len(datos.columns),
+        "columnas_ok": list(datos.columns) == COLUMNAS,
+    }
+
+
+def ruta_archivo_actual():
+    return os.path.join(UPLOAD_FOLDER, "archivo_actual")
+
+
+@app.route("/", methods=["GET", "POST"])
 def inicio():
-    datos = cargar_datos(ARCHIVO_DATOS)
-    columnas_ok = list(datos.columns) == COLUMNAS
-    nombre = escape(os.path.basename(ARCHIVO_DATOS))   # escape: evita inyectar HTML
+    os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+    os.makedirs(SALIDAS_DIR, exist_ok=True)
 
-    return f"""
-    <h1>Proyecto B · Discos Duros Cifrados</h1>
-    <p>Archivo: {nombre}</p>
-    <p>Filas: {len(datos):,}</p>
-    <p>Columnas: {len(datos.columns)}</p>
-    <p>Estructura esperada: {"Sí" if columnas_ok else "No, revisar el perfilado"}</p>
-    """
+    mensaje_error = None
+    archivo_info = None
+
+    if request.method == "POST":
+        if "archivo" not in request.files:
+            flash("No se encontró ningún archivo en la solicitud.", "error")
+            return redirect(url_for("inicio"))
+
+        archivo = request.files["archivo"]
+
+        if archivo.filename == "":
+            flash("Debes seleccionar un archivo.", "error")
+            return redirect(url_for("inicio"))
+
+        if not allowed_file(archivo.filename):
+            flash("Formato no permitido. Solo se aceptan CSV, XLSX o XLS.", "error")
+            return redirect(url_for("inicio"))
+
+        nombre_seguro = secure_filename(archivo.filename)
+        extension = nombre_seguro.rsplit(".", 1)[1].lower()
+        ruta_destino = os.path.join(UPLOAD_FOLDER, f"archivo_actual.{extension}")
+
+        archivo.save(ruta_destino)
+
+        try:
+            env = os.environ.copy()
+            env["ARCHIVO_DATOS"] = ruta_destino
+
+            resultado = subprocess.run(
+                ["python", "scripts/evaluar.py"],
+                capture_output=True,
+                text=True,
+                env=env,
+                check=False,
+            )
+
+            if resultado.returncode != 0:
+                mensaje_error = resultado.stderr or resultado.stdout or "La evaluación falló."
+                flash(f"Error al evaluar el archivo: {mensaje_error}", "error")
+            else:
+                flash("Archivo cargado y evaluado correctamente.", "ok")
+
+        except Exception as e:
+            flash(f"Error al ejecutar la evaluación: {e}", "error")
+
+        return redirect(url_for("inicio"))
+
+    # detectar archivo ya cargado
+    archivo_actual = None
+    for nombre in os.listdir(UPLOAD_FOLDER):
+        if nombre.startswith("archivo_actual."):
+            archivo_actual = os.path.join(UPLOAD_FOLDER, nombre)
+            break
+
+    archivo_info = info_archivo_actual(archivo_actual)
+    resumen = cargar_resumen()
+
+    return render_template(
+        "index.html",
+        archivo_info=archivo_info,
+        resumen=resumen,
+    )
+
+
+@app.route("/universo")
+def universo():
+    df = cargar_universo()
+    if df is None:
+        return render_template("universo.html", universo=None, filtros={}, total=0)
+
+    estado = request.args.get("estado_control", "")
+    pais = request.args.get("pais", "")
+    so = request.args.get("so", "")
+
+    filtrado = df.copy()
+
+    if estado:
+        filtrado = filtrado[filtrado["estado_control"] == estado]
+    if pais:
+        filtrado = filtrado[filtrado["País"] == pais]
+    if so:
+        filtrado = filtrado[filtrado["Sistema Operativo"] == so]
+
+    estados = sorted(df["estado_control"].dropna().unique().tolist())
+    paises = sorted(df["País"].dropna().unique().tolist())
+    sistemas = sorted(df["Sistema Operativo"].dropna().unique().tolist())
+
+    return render_template(
+        "universo.html",
+        universo=filtrado.to_dict(orient="records"),
+        total=len(filtrado),
+        filtros={
+            "estado_control": estado,
+            "pais": pais,
+            "so": so,
+            "estados": estados,
+            "paises": paises,
+            "sistemas": sistemas,
+        },
+    )
+
+
+@app.route("/reglas")
+def reglas():
+    resumen = cargar_resumen()
+    if not resumen:
+        return render_template("reglas.html", reglas=None)
+
+    return render_template("reglas.html", reglas=resumen.get("reglas", []))
+
+
+@app.route("/cobertura")
+def cobertura():
+    resumen = cargar_resumen()
+    if not resumen:
+        return render_template("cobertura.html", cobertura=None, universo=None)
+
+    return render_template(
+        "cobertura.html",
+        cobertura=resumen.get("cobertura", []),
+        universo=resumen.get("universo", {}),
+    )
+
+
+if __name__ == "__main__":
+    app.run(debug=True)
