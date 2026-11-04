@@ -141,3 +141,38 @@ pre {
     border-radius: 8px;
     overflow-x: auto;
 }
+
+.upload-form {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.upload-form input[type="file"] {
+    padding: 0.6rem;
+    background: #fff;
+}
+
+.upload-form button {
+    padding: 0.7rem 1rem;
+    background: #7a1f2b;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.hint {
+    color: #666;
+    font-size: 0.9rem;
+    margin-top: 0.8rem;
+}
+
+.alert.ok {
+    border-left: 6px solid #2e8b57;
+}
+
+.alert.error {
+    border-left: 6px solid #c0392b;
+}
