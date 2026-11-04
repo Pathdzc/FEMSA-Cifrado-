@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block title %}Reglas{% endblock %}
+
+{% block content %}
+<h2>Resumen por regla</h2>
+
+{% if reglas %}
+<div class="table-wrap">
+<table>
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Nombre</th>
+            <th>Categoría</th>
+            <th>Sí</th>
+            <th>No</th>
+            <th>Sin información</th>
+            <th>No aplica</th>
+            <th>Evaluados</th>
+            <th>Severidad si falla</th>
+        </tr>
+    </thead>
+    <tbody>
+    {% for r in reglas %}
+        <tr>
+            <td>{{ r["regla"] }}</td>
+            <td>{{ r["nombre_regla"] }}</td>
+            <td>{{ r["categoria"] }}</td>
+            <td>{{ r["Sí"] }}</td>
+            <td>{{ r["No"] }}</td>
+            <td>{{ r["Sin información"] }}</td>
+            <td>{{ r["No aplica"] }}</td>
+            <td>{{ r["evaluados"] }}</td>
+            <td>{{ r["severidad_si_falla"] }}</td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+</div>
+{% else %}
+<div class="alert">
+    No se encontró <code>salidas/resumen_reglas.json</code>.  
+    Corre primero:
+    <pre>python scripts/evaluar.py</pre>
+</div>
+{% endif %}
+{% endblock %}
