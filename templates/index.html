@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<h2>Dashboard principal</h2>
+
+<div class="card">
+    <p><strong>Archivo:</strong> {{ archivo }}</p>
+    <p><strong>Filas:</strong> {{ filas }}</p>
+    <p><strong>Columnas:</strong> {{ columnas }}</p>
+    <p><strong>Estructura esperada:</strong> {{ "Sí" if columnas_ok else "No, revisar el perfilado" }}</p>
+</div>
+
+{% if resumen %}
+    <h3>Resumen del universo</h3>
+    <div class="grid">
+        <div class="metric">
+            <span>{{ resumen.universo.equipos_unicos }}</span>
+            <small>Equipos únicos</small>
+        </div>
+        <div class="metric">
+            <span>{{ resumen.universo.registros_en_archivo }}</span>
+            <small>Registros en archivo</small>
+        </div>
+        <div class="metric">
+            <span>{{ resumen.universo.registros_repetidos }}</span>
+            <small>Registros repetidos</small>
+        </div>
+        <div class="metric">
+            <span>{{ resumen.universo.ids_faltantes_en_rango }}</span>
+            <small>IDs faltantes</small>
+        </div>
+    </div>
+
+    <h3>Estado de control</h3>
+    <div class="grid">
+        {% for estado, data in resumen.universo.estado_control.items() %}
+            <div class="metric">
+                <span>{{ data.equipos }}</span>
+                <small>{{ estado }} ({{ data.porcentaje }}%)</small>
+            </div>
+        {% endfor %}
+    </div>
+{% else %}
+    <div class="alert">
+        No se encontró <code>salidas/resumen_reglas.json</code>.  
+        Corre primero:
+        <pre>python scripts/evaluar.py</pre>
+    </div>
+{% endif %}
+{% endblock %}
