@@ -200,6 +200,8 @@ def graficas():
     estados = df["estado_control"].value_counts()
     tabla_pais = pd.crosstab(df["País"], df["estado_control"])
     tabla_so = pd.crosstab(df["Sistema Operativo"], df["estado_control"])
+    resumen = cargar_resumen()
+    reglas = resumen.get("reglas", []) if resumen else []
 
     datos = {
         "estados": {
@@ -219,6 +221,13 @@ def graficas():
                 estado: [int(v) for v in tabla_so[estado]]
                 for estado in tabla_so.columns
             },
+        },
+                "reglas": {
+            "nombres": [f'{r["regla"]} · {r["nombre_regla"]}' for r in reglas],
+            "Sí": [int(r.get("Sí", 0) or 0) for r in reglas],
+            "No": [int(r.get("No", 0) or 0) for r in reglas],
+            "Sin información": [int(r.get("Sin información", 0) or 0) for r in reglas],
+            "No aplica": [int(r.get("No aplica", 0) or 0) for r in reglas],
         },
     }
     return render_template("graficas.html", datos=datos)

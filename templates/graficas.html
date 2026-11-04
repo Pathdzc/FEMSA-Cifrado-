@@ -22,6 +22,11 @@
   <div id="g-so"></div>
 </div>
 
+<div class="card">
+  <h3>Resultados por regla</h3>
+  <div id="g-reglas"></div>
+</div>
+
 <script src="{{ url_for('static', filename='plotly.min.js') }}"></script>
 <script>
   const datos = {{ datos | tojson }};
@@ -70,6 +75,29 @@
     barmode: "stack",
     margin: { t: 20 },
     yaxis: { title: "Equipos" }
+  }, { responsive: true });
+    const coloresReglas = {
+    "Sí": "#27ae60",
+    "No": "#c0392b",
+    "Sin información": "#7f8c8d",
+    "No aplica": "#d5d8dc"
+  };
+
+  const trazasReglas = Object.keys(coloresReglas).map(r => ({
+    type: "bar",
+    orientation: "h",
+    name: r,
+    y: datos.reglas.nombres,
+    x: datos.reglas[r],
+    marker: { color: coloresReglas[r] }
+  }));
+
+  Plotly.newPlot("g-reglas", trazasReglas, {
+    barmode: "stack",
+    height: 550,
+    margin: { t: 20},
+    xaxis: { title: "Equipos" },
+    yaxis: { autorange: "reversed", automargin: true }
   }, { responsive: true });
 </script>
 {% endif %}
