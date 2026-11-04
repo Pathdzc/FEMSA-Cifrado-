@@ -191,6 +191,21 @@ def cobertura():
         universo=resumen.get("universo", {}),
     )
 
+@app.route("/graficas")
+def graficas():
+    df = cargar_universo()
+    if df is None:
+        return render_template("graficas.html", datos=None)
+
+    estados = df["estado_control"].value_counts()
+
+    datos = {
+        "estados": {
+            "labels": estados.index.tolist(),
+            "values": [int(v) for v in estados.values],
+        },
+    }
+    return render_template("graficas.html", datos=datos)
 
 if __name__ == "__main__":
     app.run(debug=True)

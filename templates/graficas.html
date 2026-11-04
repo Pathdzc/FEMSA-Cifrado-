@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %}Gráficas{% endblock %}
+
+{% block content %}
+<h2>Gráficas</h2>
+
+{% if not datos %}
+<div class="alert">Primero carga un archivo en el Dashboard.</div>
+{% else %}
+<div class="card">
+  <h3>Estado de control</h3>
+  <div id="g-estados"></div>
+</div>
+
+<script src="{{ url_for('static', filename='plotly.min.js') }}"></script>
+<script>
+  const datos = {{ datos | tojson }};
+
+  const colores = {
+    "No cifrado": "#c0392b",
+    "Sin visibilidad": "#7f8c8d",
+    "Cifrado fuera de política": "#e67e22",
+    "Cifrado, política sin verificar": "#f1c40f",
+    "Cumple": "#27ae60"
+  };
+
+  Plotly.newPlot("g-estados", [{
+    type: "pie",
+    labels: datos.estados.labels, 
+    values: datos.estados.values,
+    hole: 0.4,
+    marker: { colors: datos.estados.labels.map(e => colores[e] || "#999") }
+  }], { margin: { t: 20 } }, { responsive: true });
+</script>
+{% endif %}
+{% endblock %}
