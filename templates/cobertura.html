@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}Cobertura{% endblock %}
+
+{% block content %}
+<h2>Verificación de cobertura</h2>
+
+{% if cobertura %}
+<div class="card">
+    <p><strong>Equipos únicos:</strong> {{ universo.equipos_unicos }}</p>
+    <p><strong>Registros en archivo:</strong> {{ universo.registros_en_archivo }}</p>
+    <p><strong>Registros repetidos:</strong> {{ universo.registros_repetidos }}</p>
+    <p><strong>Inconsistencias de fuente:</strong> {{ universo.fuente_inconsistente }}</p>
+</div>
+
+<ul class="checklist">
+    {% for c in cobertura %}
+        <li class="{{ 'ok' if c.ok else 'fail' }}">
+            <strong>{{ "OK" if c.ok else "FALLA" }}</strong> — {{ c.chequeo }}
+            {% if c.detalle %}
+                <br><small>{{ c.detalle }}</small>
+            {% endif %}
+        </li>
+    {% endfor %}
+</ul>
+{% else %}
+<div class="alert">
+    No se encontró <code>salidas/resumen_reglas.json</code>.  
+    Corre primero:
+    <pre>python scripts/evaluar.py</pre>
+</div>
+{% endif %}
+{% endblock %}
