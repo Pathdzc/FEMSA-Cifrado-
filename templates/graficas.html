@@ -12,6 +12,11 @@
   <div id="g-estados"></div>
 </div>
 
+<div class="card">
+  <h3>Estado de control por país</h3>
+  <div id="g-pais"></div>
+</div>
+
 <script src="{{ url_for('static', filename='plotly.min.js') }}"></script>
 <script>
   const datos = {{ datos | tojson }};
@@ -31,6 +36,21 @@
     hole: 0.4,
     marker: { colors: datos.estados.labels.map(e => colores[e] || "#999") }
   }], { margin: { t: 20 } }, { responsive: true });
+    const trazasPais = Object.keys(colores)
+    .filter(e => datos.por_pais.estados[e])
+    .map(e => ({
+      type: "bar",
+      name: e,
+      x: datos.por_pais.paises,
+      y: datos.por_pais.estados[e],
+      marker: { color: colores[e] }
+    }));
+
+  Plotly.newPlot("g-pais", trazasPais, {
+    barmode: "stack",
+    margin: { t: 20 },
+    yaxis: { title: "Equipos" }
+  }, { responsive: true });
 </script>
 {% endif %}
 {% endblock %}

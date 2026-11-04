@@ -198,11 +198,19 @@ def graficas():
         return render_template("graficas.html", datos=None)
 
     estados = df["estado_control"].value_counts()
+    tabla_pais = pd.crosstab(df["País"], df["estado_control"])
 
     datos = {
         "estados": {
             "labels": estados.index.tolist(),
             "values": [int(v) for v in estados.values],
+        },
+                "por_pais": {
+            "paises": tabla_pais.index.tolist(),
+            "estados": {
+                estado: [int(v) for v in tabla_pais[estado]]
+                for estado in tabla_pais.columns
+            },
         },
     }
     return render_template("graficas.html", datos=datos)
